@@ -1,49 +1,67 @@
 #include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string>
 
 using namespace std;
 
-int i,zr,xnr,onr,var[8],fin[5];
-char temp[1];
+class stareJoc{
+public:
+    int zr;
+    int xnr;
+    int onr;
+};
 
 int main()
 {
     // initializare
+    stareJoc variabileTabla;
+    int i,var[8],fin[5];
+    string linieJoc;
     ifstream inFisier("ttt.in");
     ofstream outFisier("ttt.out");
-    xnr=0; onr=0;
-//    for(zr=1;zr<=4;zr++)
-//        outFisier<<fin[zr]<<" ";
-//    outFisier<<endl;
-
-    // configurare si verificare joc(uri)
-    while(inFisier>>temp)
+    if(inFisier.is_open())
     {
-        if(strcmp(temp,"X")==0)
+        // citeste joc
+        while(getline(inFisier,linieJoc))
         {
-            var[i]=1;
-            xnr++;
-        }
-        if(strcmp(temp,"0")==0)
-        {
-            var[i]=2;
-            onr++;
-        }
-//        outFisier<<var[i]<<" ";
-        i++;
+            // seteaza inceput joc
+            for(i=0;i<=8;i++)
+            {
+                var[i]=0;
+                fin[i]=0;
+            }
+            i=0;
+            variabileTabla.zr=0;
+            variabileTabla.xnr=0;
+            variabileTabla.onr=0;
 
-        // determinare joc
-        // fin[1]=jocul e invalid, 2=incomplet, 3=primul castiga, 4=al doilea castiga
-        if(i==9)
-        {
-//            outFisier<<endl;
-//            for(zr=0;zr<=3;zr++)
-//                outFisier<<fin[zr]<<" ";
-//            outFisier<<endl;
-            if(onr+xnr<9)
+int tmp; //efectiv nu functioneaza daca nu numara aceasta variabila
+
+            // detecteaza pozitii si simboluri
+            for(char& temp : linieJoc)
+            {
+                tmp++; //lasat pentru functionalitatea programului pana fix
+                if(temp=='X')
+                {
+                    var[i]=1;
+                    variabileTabla.xnr++;
+                    i++;
+                }
+                if(temp=='0')
+                {
+                    var[i]=2;
+                    variabileTabla.onr++;
+                    i++;
+                }
+                if(temp=='-')
+                    i++;
+            }
+
+            // seteaza regulile
+            // fin[1]=invalid, 2=incomplet, 3=I castiga, 4=II castiga
+            if(variabileTabla.onr+variabileTabla.xnr<9)
                 fin[1]=1;
-            if(onr>xnr)
+            if(variabileTabla.onr>variabileTabla.xnr)
                 fin[2]=1;
             if(var[0]>0 && var[0]==var[3] && var[3]==var[6])
                 fin[var[0]+2]=1;
@@ -62,7 +80,7 @@ int main()
             if(var[2]>0 && var[2]==var[4] && var[4]==var[6])
                 fin[var[2]+2]=1;
 
-            zr=0;
+            //verificare joc
             for(i=4;i>=1;i--)
             {
                 if(fin[4]==fin[3] && fin[4]==1)
@@ -83,23 +101,17 @@ int main()
                     break;
                 }
                 else
-                    zr++;
-                if(zr==4)
+                    variabileTabla.zr++;
+                if(variabileTabla.zr==4)
                 {
                     outFisier<<"Egalitate."<<endl;
                     break;
                 }
             }
-//            outFisier<<"xnr="<<xnr<<" onr="<<onr<<endl;
-
-            //reinitializare pentru jocul urmator
-            for(i=0;i<=8;i++)
-            {   var[i]=0;
-                fin[i]=0;   }
-            i=0;
-            xnr=0;
-            onr=0;
         }
     }
+    else
+        cout<<"Fisierul de intrare nu a putut fi deschis ori nu exista."<<endl;
+
     return 0;
 }
